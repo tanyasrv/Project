@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        canvas {
+            background-image: url('/image/smooth-dark-blue-background_1258-45745.jpg.webp');
+            background-size: cover;
+           
+            border: 2px solid black;
+            display: block;
+            margin: 0 auto;
+        }
+        
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+     
+     <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        const ball = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            radius: 20,
+            color: "blue",
+            velocityX: 0,
+            velocityY: 0,
+            speed: 5,
+        };
+
+        let isBouncing = false;
+
+        canvas.addEventListener("mousedown", (e) => {
+            if (!isBouncing) {
+                const mouseX = e.clientX - canvas.getBoundingClientRect().left;
+                const mouseY = e.clientY - canvas.getBoundingClientRect().top;
+
+                const angle = Math.atan2(mouseY - ball.y, mouseX - ball.x);
+                ball.velocityX = Math.cos(angle) * ball.speed;
+                ball.velocityY = Math.sin(angle) * ball.speed;
+
+                isBouncing = true;
+            }
+        });
+
+        function drawBall() {
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fillStyle = ball.color;
+            ctx.fill();
+            ctx.closePath();
+         }
+
+         function update() {
+            if (isBouncing) {
+                ball.x += ball.velocityX;
+                ball.y += ball.velocityY;
+
+                // Bounce off the walls
+                if (ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) {
+                    ball.velocityX = -ball.velocityX;
+                }
+                if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
+                    ball.velocityY = -ball.velocityY;
+                }
+            }
+         }
+
+         function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBall();
+            update();
+            requestAnimationFrame(gameLoop);
+        }
+
+         gameLoop();
+    </script>
+</body>
+</html>
